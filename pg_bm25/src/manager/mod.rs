@@ -3,11 +3,7 @@ use pgrx::{
     pg_sys::{BlockNumber, ItemPointerData, OffsetNumber},
 };
 use std::collections::HashMap;
-use tantivy::{
-    query::Query,
-    schema::{FieldType, Schema},
-    DocAddress, Document, Searcher, Snippet, SnippetGenerator,
-};
+use tantivy::DocAddress;
 
 static mut MANAGER: Manager = Manager::new();
 
@@ -31,7 +27,6 @@ pub struct Manager {
     min_score: f32,
     scores: Option<HashMap<BlockInfo, f32>>,
     doc_addresses: Option<HashMap<BlockInfo, DocAddress>>,
-    snippet_generators: Option<HashMap<String, SnippetGenerator>>,
 }
 
 impl Manager {
@@ -41,7 +36,6 @@ impl Manager {
             max_score: 0.0,
             min_score: 0.0,
             doc_addresses: None,
-            snippet_generators: None,
         }
     }
 
@@ -83,67 +77,5 @@ impl Manager {
             .as_mut()
             .unwrap()
             .insert(ctid, doc_address);
-    }
-
-    pub fn get_doc_address(&mut self, ctid: ItemPointerData) -> Option<DocAddress> {
-        let (block, offset) = item_pointer_get_both(ctid);
-        self.doc_addresses
-            .as_mut()
-            .unwrap()
-            .get(&(block, offset))
-            .copied()
-    }
-
-    pub fn add_snippet_generators(
-        &mut self,
-        searcher: &Searcher,
-        schema: &Schema,
-        query: &dyn Query,
-        highlights_max_num_chars: Option<usize>,
-    ) {
-        // Because we're adding the whole schema at once, we can replace to make sure
-        // that we're adding to a clean hash map.
-
-        self.snippet_generators.replace(HashMap::new());
-        for field in schema.fields() {
-            let field_name = field.1.name().to_string();
-
-            if let FieldType::Str(_) = field.1.field_type() {
-                let mut snippet_generator = SnippetGenerator::create(searcher, query, field.0)
-                    .unwrap_or_else(|err| {
-                        panic!(
-                            "failed to create snippet generator for field: {field_name}... {err}"
-                        )
-                    });
-
-                if let Some(max_num_chars) = highlights_max_num_chars {
-                    snippet_generator.set_max_num_chars(max_num_chars);
-                }
-
-                self.snippet_generators
-                    .as_mut()
-                    .unwrap()
-                    .insert(field_name, snippet_generator);
-            }
-        }
-    }
-
-    pub fn get_highlight(&mut self, field_name: &str, doc: &Document) -> Option<String> {
-        let snippet_generator_map = self
-            .snippet_generators
-            .as_ref()
-            .expect("snippet generators not correctly initialized");
-
-        let snippet_generator = snippet_generator_map.get(field_name).unwrap_or_else(|| {
-            panic!("failed to retrieve snippet generator to highlight field: {field_name}...")
-        });
-
-        let snippet = snippet_generator.snippet_from_doc(doc);
-
-        Some(self.parse_snippet(snippet))
-    }
-
-    fn parse_snippet(&self, snippet: Snippet) -> String {
-        snippet.to_html()
     }
 }

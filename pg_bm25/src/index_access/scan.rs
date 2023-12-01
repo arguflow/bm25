@@ -157,14 +157,6 @@ pub extern "C" fn amrescan(
     manager.set_max_score(max_score);
     manager.set_min_score(min_score);
 
-    // Extract highlight_max_num_chars from the query config and add snippet generators.
-    manager.add_snippet_generators(
-        searcher,
-        schema,
-        &tantivy_query,
-        query_config.config.max_num_chars,
-    );
-
     // Cache the constructed query in the scan state for potential subsequent use.
     state.query = tantivy_query;
 
@@ -228,17 +220,11 @@ pub extern "C" fn amgettuple(
 
 #[pg_guard]
 pub extern "C" fn ambitmapscan(scan: pg_sys::IndexScanDesc, tbm: *mut pg_sys::TIDBitmap) -> i64 {
-    // We get a fresh executor manager here to clear out memory from previous queries.
-    let manager = get_fresh_executor_manager();
     let scan: PgBox<pg_sys::IndexScanDescData> = unsafe { PgBox::from_pg(scan) };
     let state =
         unsafe { (scan.opaque as *mut TantivyScanState).as_mut() }.expect("no scandesc state");
     let searcher = &state.searcher;
     let schema = &state.schema;
-    let query = &state.query;
-
-    // Add snippet generators
-    manager.add_snippet_generators(searcher, schema, query, None);
 
     let mut cnt = 0i64;
     let iterator = unsafe { state.iterator.as_mut() }.expect("no iterator in state");

@@ -3,7 +3,6 @@ use rustc_hash::{FxHashMap, FxHashSet};
 
 use crate::manager::get_current_executor_manager;
 use crate::operator::scan_index;
-use crate::parade_index::index::ParadeIndex;
 
 #[pg_extern]
 pub fn rank_bm25(ctid: Option<ItemPointerData>) -> f32 {
@@ -13,31 +12,6 @@ pub fn rank_bm25(ctid: Option<ItemPointerData>) -> f32 {
             .unwrap_or(0.0f32),
         None => 0.0f32,
     }
-}
-
-#[pg_extern]
-pub fn highlight_bm25(
-    ctid: Option<ItemPointerData>,
-    index_name: String,
-    field_name: String,
-) -> String {
-    let ctid = match ctid {
-        Some(ctid) => ctid,
-        _ => return "".into(),
-    };
-    let manager = get_current_executor_manager();
-    let parade_index = ParadeIndex::from_index_name(index_name);
-    let doc_address = manager
-        .get_doc_address(ctid)
-        .expect("could not lookup doc address in manager in highlight_bm25");
-    let retrieved_doc = parade_index
-        .searcher()
-        .doc(doc_address)
-        .expect("searcher could not retrieve doc by address in highlight_bm25");
-
-    manager
-        .get_highlight(&field_name, &retrieved_doc)
-        .unwrap_or("".into())
 }
 
 #[allow(clippy::not_unsafe_ptr_arg_deref)]

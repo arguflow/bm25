@@ -110,29 +110,6 @@ This will return:
  Bluetooth-enabled speaker   |      3 | Electronics
 (5 rows)
 ```
-
-Scoring and highlighting are supported:
-
-```sql
-SELECT description, rating, category, paradedb.rank_bm25(ctid), paradedb.highlight_bm25(ctid, 'idx_mock_items', 'description')
-FROM mock_items
-WHERE mock_items @@@ 'description:keyboard OR category:electronics'
-LIMIT 5;
-```
-
-This will return:
-
-```csv
- id |         description         | rating |  category   | rank_bm25 |         highlight_bm25
-----+-----------------------------+--------+-------------+-----------+---------------------------------
-  1 | Ergonomic metal keyboard    |      4 | Electronics | 4.9403534 | Ergonomic metal <b>keyboard</b>
-  2 | Very plasticy keyboard      |      4 | Electronics | 4.9403534 | Very plasticy <b>keyboard</b>
- 12 | Innovative wireless earbuds |      5 | Electronics | 2.1096356 |
- 22 | Fast charging power bank    |      4 | Electronics | 2.1096356 |
- 32 | Bluetooth-enabled speaker   |      3 | Electronics | 2.1096356 |
-(5 rows)
-```
-
 Scores can be tuned via boosted queries:
 
 ```sql
