@@ -70,13 +70,9 @@ impl ParadeNormalizer {
 
 // Index record schema
 #[allow(unused)]
-#[derive(utoipa::ToSchema)]
 pub enum IndexRecordOptionSchema {
-    #[schema(rename = "basic")]
     Basic,
-    #[schema(rename = "freq")]
     WithFreqs,
-    #[schema(rename = "position")]
     WithFreqsAndPositions,
 }
 
@@ -95,7 +91,7 @@ impl ToString for IndexRecordOption {
 }
 
 // Text options
-#[derive(Copy, Clone, Debug, Deserialize, Serialize, utoipa::ToSchema)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub struct ParadeTextOptions {
     #[serde(default = "default_as_true")]
     indexed: bool,
@@ -107,7 +103,6 @@ pub struct ParadeTextOptions {
     fieldnorms: bool,
     #[serde(default)]
     pub tokenizer: ParadeTokenizer,
-    #[schema(value_type = IndexRecordOptionSchema)]
     #[serde(default)]
     record: IndexRecordOption,
     #[serde(default)]
@@ -230,7 +225,7 @@ impl From<ParadeBooleanOptions> for NumericOptions {
 }
 
 // Json options
-#[derive(Copy, Clone, Debug, Deserialize, Serialize, utoipa::ToSchema)]
+#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
 pub struct ParadeJsonOptions {
     #[serde(default = "default_as_true")]
     indexed: bool,
@@ -242,7 +237,6 @@ pub struct ParadeJsonOptions {
     expand_dots: bool,
     #[serde(default)]
     pub tokenizer: ParadeTokenizer,
-    #[schema(value_type = IndexRecordOptionSchema)]
     #[serde(default)]
     record: IndexRecordOption,
     #[serde(default)]
