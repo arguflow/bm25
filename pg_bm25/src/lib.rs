@@ -1,6 +1,5 @@
 use pgrx::*;
 use shared::logs::ParadeLogsGlobal;
-use shared::telemetry;
 
 mod api;
 mod index_access;
@@ -24,7 +23,6 @@ extension_sql_file!("../sql/_bootstrap.sql");
 #[pg_guard]
 pub unsafe extern "C" fn _PG_init() {
     index_access::options::init();
-    telemetry::posthog::init("pg_bm25 Deployment");
     PARADE_LOGS_GLOBAL.init();
 }
 
