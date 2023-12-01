@@ -36,7 +36,6 @@ pub struct SearchQueryConfig {
     pub distance: Option<u8>,
     pub transpose_cost_one: Option<bool>,
     pub prefix: Option<bool>,
-    #[serde(default, deserialize_with = "from_csv")]
     pub max_num_chars: Option<usize>,
 }
 
