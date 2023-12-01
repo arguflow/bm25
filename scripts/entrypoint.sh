@@ -84,24 +84,6 @@ EOSQL
 # We need to restart the server for the changes above to be reflected
 pg_ctl restart
 
-# We collect basic, anonymous telemetry to help us understand how many people are using
-# the project. We only do this if TELEMETRY is set to "true", and only do it once per deployment
-if [[ ${TELEMETRY:-} == "true" ]]; then
-  curl -s -L --header "Content-Type: application/json" -d '{
-    "api_key": "'"$POSTHOG_API_KEY"'",
-    "event": "ParadeDB Deployment",
-    "distinct_id": "'"$(uuidgen)"'",
-    "properties": {
-      "commit_sha": "'"${COMMIT_SHA:-}"'"
-    }
-  }' "$POSTHOG_HOST/capture/" > /dev/null
-fi
-
-# Mark telemetry as handled so we don't try to send it again when
-# initializing our PostgreSQL extensions. We use a file for IPC
-# between this script and our PostgreSQL extensions
-echo "true" > /tmp/telemetry
-
 echo "PostgreSQL is up - installing extensions..."
 
 # Preinstall extensions for which a version is specified
