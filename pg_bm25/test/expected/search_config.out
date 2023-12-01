@@ -74,14 +74,3 @@ SELECT id, description, rating, category FROM search_config WHERE search_config 
   1 | Ergonomic metal keyboard |      4 | Electronics
   2 | Plastic Keyboard         |      4 | Electronics
 (2 rows)
-
--- With fuzzy and regex field
-SELECT id, description, rating, category FROM search_config WHERE search_config @@@ 'com:::regex_fields=description&fuzzy_fields=description';
-ERROR:  cannot search with both regex_fields and fuzzy_fields
--- With regex field 
-SELECT id, description, rating, category FROM search_config WHERE search_config @@@ 'com:::regex_fields=description';
- id |      description       | rating |  category   
-----+------------------------+--------+-------------
-  6 | Compact digital camera |      5 | Photography
- 23 | Comfortable slippers   |      3 | Footwear
-(2 rows)

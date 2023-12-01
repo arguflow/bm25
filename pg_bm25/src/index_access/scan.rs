@@ -1,10 +1,5 @@
 use pgrx::*;
-use tantivy::{
-    collector::TopDocs,
-    query::{BooleanQuery, Query, RegexQuery},
-    query_grammar::Occur,
-    DocAddress,
-};
+use tantivy::{collector::TopDocs, query::Query, DocAddress};
 
 use crate::{
     index_access::utils::{get_parade_index, SearchQuery},
@@ -69,15 +64,6 @@ pub extern "C" fn amrescan(
     });
 
     let fuzzy_fields = query_config.config.fuzzy_fields;
-    let regex_fields = query_config.config.regex_fields;
-
-    // Determine if we're using regex fields based on the presence or absence of prefix and fuzzy fields.
-    // It panics if both are provided as that's considered an invalid input.
-    let using_regex_fields = match (!regex_fields.is_empty(), !fuzzy_fields.is_empty()) {
-        (true, true) => panic!("cannot search with both regex_fields and fuzzy_fields"),
-        (true, false) => true,
-        _ => false,
-    };
 
     // We get a fresh executor manager here to clear out memory from previous queries.
     let manager = get_fresh_executor_manager();
@@ -98,28 +84,7 @@ pub extern "C" fn amrescan(
     let offset = query_config.config.offset.unwrap_or(0);
 
     // Construct the actual Tantivy search query based on the mode determined above.
-    let tantivy_query: Box<dyn Query> = if using_regex_fields {
-        let regex_pattern = format!("{}.*", &query_config.query);
-        let mut queries: Vec<Box<dyn Query>> = Vec::new();
-
-        // Build a regex query for each specified regex field.
-        for field_name in &regex_fields {
-            if let Ok(field) = schema.get_field(field_name) {
-                let regex_query =
-                    Box::new(RegexQuery::from_pattern(&regex_pattern, field).unwrap());
-                queries.push(regex_query);
-            }
-        }
-
-        // If there's only one query, use it directly; otherwise, combine the queries.
-        if queries.len() == 1 {
-            queries.remove(0)
-        } else {
-            let boolean_query =
-                BooleanQuery::new(queries.into_iter().map(|q| (Occur::Should, q)).collect());
-            Box::new(boolean_query)
-        }
-    } else {
+    let tantivy_query: Box<dyn Query> = {
         // Set fuzzy search configuration for each specified fuzzy field.
         let fuzzy_fields: Vec<String> = fuzzy_fields;
 
