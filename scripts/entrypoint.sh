@@ -6,28 +6,6 @@ set -Eeuo pipefail
 # List of extensions to possibly install (if a version variable is set)
 declare -A extensions=(
   [pg_bm25]=${PG_BM25_VERSION:-}
-  [pg_search]=${PG_SEARCH_VERSION:-}
-  [pg_sparse]=${PG_SPARSE_VERSION:-}
-  [vector]=${PGVECTOR_VERSION:-}
-  [pg_cron]=${PG_CRON_VERSION:-}
-  [pg_net]=${PG_NET_VERSION:-}
-  [pg_ivm]=${PG_IVM_VERSION:-}
-  [pg_graphql]=${PG_GRAPHQL_VERSION:-}
-  [pg_hashids]=${PG_HASHIDS_VERSION:-}
-  [pg_jsonschema]=${PG_JSONSCHEMA_VERSION:-}
-  [pg_repack]=${PG_REPACK_VERSION:-}
-  [pg_stat_monitor]=${PG_STAT_MONITOR_VERSION:-}
-  [pg_hint_plan]=${PG_HINT_PLAN_VERSION:-}
-  [pgfaceting]=${PGFACETING_VERSION:-}
-  [pgtap]=${PGTAP_VERSION:-}
-  [pgaudit]=${PGAUDIT_VERSION:-}
-  [postgis]=${POSTGIS_VERSION:-}
-  [pgrouting]=${PGROUTING_VERSION:-}
-  [roaringbitmap]=${PG_ROARINGBITMAP_VERSION:-}
-  [http]=${PGSQL_HTTP_VERSION:-}
-  [hypopg]=${HYPOPG_VERSION:-}
-  [rum]=${RUM_VERSION:-}
-  [age]=${AGE_VERSION:-}
 )
 
 # List of extensions that must be added to shared_preload_libraries
