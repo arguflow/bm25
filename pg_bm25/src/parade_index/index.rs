@@ -1,7 +1,5 @@
 use pgrx::pg_sys::{IndexBulkDeleteCallback, IndexBulkDeleteResult, ItemPointerData};
 use pgrx::*;
-use serde_json::json;
-use shared::plog;
 use std::collections::HashMap;
 use std::error::Error;
 use std::ffi::{CStr, CString};
@@ -119,14 +117,6 @@ impl ParadeIndex {
             panic!("failed to create index reader while creating new index: {name}")
         });
 
-        plog!(
-            "creating ParadeIndex",
-            json!({
-                "name": name,
-                "fields": fields,
-                "field_configs": field_configs
-            })
-        );
         let new_self = Self {
             name: name.clone(),
             fields,
