@@ -22,12 +22,12 @@ use pgrx::Spi;
 /// - It cannot parse the retrieved port into an unsigned 32-bit integer.
 ///
 /// # Examples
-/// ```
+// ```
 /// let query = "SELECT * FROM my_table WHERE id = 1";
 /// let dblink_query = dblink(query);
 /// println!("DBLink Query: {}", dblink_query);
 /// // Output: DBLink Query: dblink('host=localhost port=5432 dbname=mydb', 'SELECT * FROM my_table WHERE id = 1')
-/// ```
+// ```
 pub fn dblink(query: &str) -> String {
     // Retrieve the current database name from the PostgreSQL environment.
     let current_db_name: String = Spi::get_one("SELECT current_database()::text")
