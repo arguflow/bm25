@@ -1,9 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
-    "pg_bm25",
-    "shared"
-]
+members = ["pg_bm25"]
 
 [profile.dev]
 panic = "unwind"
